@@ -21,7 +21,7 @@ interface MasterOrderRepository: JpaRepository<MasterOrders, Long>, JpaSpecifica
 
   @Transactional @Modifying
   @Query("insert into master_order('checkinDt','table_id') values(?2,?1)", nativeQuery = true)
-  fun checkin(tableId: Long, checkinDt: String )
+  fun checkin(tableId: Long, checkinDt: String)
 
   @Transactional @Modifying
   @Query("update MasterOrders m set m.checkoutDt=?1, m.status='Completed' where m.id=?2")
