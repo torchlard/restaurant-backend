@@ -9,6 +9,11 @@ class DateTimeHelper {
   }
 }
 
+class SqlHelper {
+  companion object {
+    fun generateInString(ll: List<Long>): String = ll.joinToString(separator=",")
+  }
+}
 
 
 

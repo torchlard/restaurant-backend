@@ -37,7 +37,6 @@ data class MasterOrders (
   var payment: Float? = null,
   var price: Float? = null,
   @ManyToOne var staff: Staffs,
-  @ManyToOne var table: Tables,
   @Enumerated(EnumType.STRING)
   var status: Status = Status.Serving
 )
@@ -71,7 +70,7 @@ data class Tables (
   @Id @GeneratedValue var id: Long,
   var tableNo: String,
   var numOfSeat: Int,
-  var available: Boolean
+  @ManyToOne var masterOrder: MasterOrders? = null
 )
 
 

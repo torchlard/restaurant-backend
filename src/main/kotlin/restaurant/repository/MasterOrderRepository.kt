@@ -24,8 +24,9 @@ interface MasterOrderRepository: JpaRepository<MasterOrders, Long>, JpaSpecifica
   fun checkin(tableId: Long, checkinDt: String)
 
   @Transactional @Modifying
-  @Query("update MasterOrders m set m.checkoutDt=?1, m.status='Completed' where m.id=?2")
-  fun checkout(checkoutDt: LocalDateTime, id: Long)
+  @Query("update master_order set checkout_dt=?1, status='Completed' where id = (" +
+      "select master_order_id from table where tableNo = ?2)) ", nativeQuery = true)
+  fun checkout(checkoutDt: LocalDateTime = LocalDateTime.now(), tableId: Long)
 
 //  @Transactional @Modifying
 //  @Query("update MasterOrders m set m.checkinDt=?1, m.status='Serving' where m.id=?2")
