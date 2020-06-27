@@ -14,22 +14,20 @@ class MasterOrderController (private val masterOrderService: MasterOrderService,
 
   @PostMapping("/checkin")
   fun checkin(@RequestBody dto: CheckinDTO): HttpStatus {
-    try {
-      return if(masterOrderService.checkin(dto.tableId).success) HttpStatus.OK else HttpStatus.BAD_REQUEST
+    return try {
+      if(masterOrderService.checkin(dto.tableId).success) HttpStatus.OK else HttpStatus.BAD_REQUEST
     }
-    catch(e: IllegalArgumentException){ return HttpStatus.BAD_REQUEST }
-    catch (e: Exception){ return HttpStatus.INTERNAL_SERVER_ERROR }
+    catch(e: IllegalArgumentException){ HttpStatus.BAD_REQUEST }
+    catch(e: Exception){ HttpStatus.INTERNAL_SERVER_ERROR }
   }
 
   @PostMapping("/checkout")
   fun checkout(@RequestBody dto: CheckinDTO): HttpStatus {
-    return try {
-      repo.checkout(tableId = dto.tableId)
-      HttpStatus.OK
-    } catch (e: Exception){
-      HttpStatus.BAD_REQUEST
-    }
+    return if(masterOrderService.checkout(dto.tableId).success) HttpStatus.OK
+      else HttpStatus.BAD_REQUEST
   }
+
+
 
 }
 

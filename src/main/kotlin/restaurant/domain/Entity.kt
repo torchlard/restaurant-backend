@@ -25,7 +25,8 @@ data class Foods (
   var price: Float,
   var quantity: Int,
   @Enumerated(EnumType.STRING)
-  var category: Category
+  var category: Category,
+  var deprecated: Boolean
 )
 
 @Entity

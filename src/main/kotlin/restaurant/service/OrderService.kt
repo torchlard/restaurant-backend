@@ -13,10 +13,9 @@ import java.sql.SQLException
 @Service
 class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepository) {
 
-  fun createOrderInBatch(tableNo: String, orderList: List<OrderDTO>): ResponseDto<List<Long>> {
-
+  fun createOrderInBatch(tableId: Long, orderList: List<OrderDTO>): ResponseDto<List<Long>> {
     return try {
-      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableNo)
+      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
           ?: throw RuntimeException("no master order found")
       val foodList: List<Long> = orderList.map {
         try { orderRepo.createOrder(it.orderQty, masterOrderId, it.foodId); -1
@@ -29,9 +28,9 @@ class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepositor
     }
   }
 
-  fun deleteOrderInBatch(tableNo: String, foodIds: List<Long>): ResponseDto<String> {
+  fun deleteOrderInBatch(tableId: Long, foodIds: List<Long>): ResponseDto<String> {
     return try {
-      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableNo)
+      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
           ?: throw RuntimeException("no master order found")
       orderRepo.deleteOrdersInBatch(masterOrderId, foodIds.joinToString(","))
       ResponseDto(true, "")
@@ -40,9 +39,9 @@ class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepositor
     }
   }
 
-  fun updateOrderInBatch(tableNo: String, ll: List<OrderDTO>): ResponseDto<List<Long>> {
+  fun updateOrderInBatch(tableId: Long, ll: List<OrderDTO>): ResponseDto<List<Long>> {
     return try {
-      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableNo)
+      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
           ?: throw RuntimeException("no master order found")
       val failedId = mutableListOf<Long>()
       ll.forEach {
@@ -63,9 +62,9 @@ class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepositor
     }
   }
 
-  fun updateArriveQtyInBatch(tableNo: String, ll: List<ArriveOrderDTO>): ResponseDto<List<Long>> {
+  fun updateArriveQtyInBatch(tableId: Long, ll: List<ArriveOrderDTO>): ResponseDto<List<Long>> {
     return try {
-      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableNo)
+      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
           ?: throw RuntimeException("no master order found")
       val failedId = mutableListOf<Long>()
       ll.forEach {

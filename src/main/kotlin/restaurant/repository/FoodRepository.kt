@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import restaurant.domain.Category
 import restaurant.domain.Foods
 import javax.transaction.Transactional
 
@@ -17,7 +18,7 @@ interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<F
   fun reduceQty(qty: Int, id: Long)
 
   @Query("select distinct f.category from Foods f")
-  fun findDistinctCategory()
+  fun findDistinctCategory(): List<Category>
 
 
 
