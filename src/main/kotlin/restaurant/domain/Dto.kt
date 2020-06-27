@@ -17,7 +17,7 @@ data class ArriveOrderDTO @JsonCreator constructor(val arriveQty: Int, val foodI
 data class OrderListDTO<T> @JsonCreator constructor(val tableId: Long, val ll: List<T>)
 //data class DeleteOrderListDTO @JsonCreator constructor(val tableNo: String, val foodList: List<Long>)
 
-
+data class FoodDTO @JsonCreator constructor(val name: String, val price: Float, val quantity: Int = 0, val category: Category)
 
 
 

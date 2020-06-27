@@ -20,7 +20,7 @@ enum class Position(val pos: String) {
 
 @Entity
 data class Foods (
-  @Id @GeneratedValue var id: Long,
+  @Id @GeneratedValue var id: Long?,
   var name: String,
   var price: Float,
   var quantity: Int,

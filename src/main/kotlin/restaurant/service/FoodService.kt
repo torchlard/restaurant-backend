@@ -30,7 +30,8 @@ class FoodService(val foodRepo: FoodRepository) {
   fun consumeFood(foodId: Long, qty: Int): ResponseDto<Long> {
     try {
       val food = foodRepo.findById(foodId)
-      if(food.isEmpty) return ResponseDto(false, foodId, "Food does not exist")
+      if(food.isEmpty) return ResponseDto(false, foodId,try { foodRepo.deleteFood(foodId); HttpStatus.OK }
+    catch(e : Exception) { HttpStatus.INTERNAL_SERVER_ERROR } "Food does not exist")
       if(food.get().quantity < qty) return ResponseDto(false, foodId, "Food does not have enough quantity")
       foodRepo.reduceQty(qty, foodId)
 

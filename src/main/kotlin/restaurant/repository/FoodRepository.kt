@@ -20,7 +20,9 @@ interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<F
   @Query("select distinct f.category from Foods f")
   fun findDistinctCategory(): List<Category>
 
-
+  @Transactional @Modifying
+  @Query("update Foods f set f.deprecated = true where f.id = ?1")
+  fun deleteFood(foodId: Long)
 
 }
 
