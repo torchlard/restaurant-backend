@@ -21,8 +21,6 @@ class MasterOrderService(val staffRepo: StaffRepository,
   @Transactional(propagation = Propagation.SUPPORTS)
   fun checkin(tableId: Long): ResponseDto<String>{
     return try{
-//      val id = masterOrderRepo.createRecord(DateTimeHelper.getCurrentSQLDt())
-//      println(id)
       val mo = MasterOrders(checkinDt = LocalDateTime.now(), status = Status.Serving)
       val inserted = masterOrderRepo.save(mo)
       tableRepo.assignMasterId(tableId, inserted.id)

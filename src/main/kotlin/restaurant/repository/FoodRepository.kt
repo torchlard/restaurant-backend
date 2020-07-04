@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository
 import restaurant.domain.Category
 import restaurant.domain.Foods
 import restaurant.domain.QtyDTO
+import javax.persistence.Tuple
+import javax.persistence.TupleElement
+import javax.persistence.TypedQuery
 import javax.transaction.Transactional
 
 
@@ -25,8 +28,8 @@ interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<F
   @Query("update Foods f set f.valid = false where f.id = ?1")
   fun deleteFood(foodId: Long)
 
-  @Query("select id, quantity from food f where id in (?1)", nativeQuery = true)
-  fun selectQtyInBatch(ids: String): List<QtyDTO>
+  @Query("select id, quantity from foods f where id in (?1)", nativeQuery = true)
+  fun selectQtyInBatch(ids: String): List<TypedQuery<Tuple>>
 
   @Transactional @Modifying
   @Query("alter table foods auto_increment=1", nativeQuery = true)
