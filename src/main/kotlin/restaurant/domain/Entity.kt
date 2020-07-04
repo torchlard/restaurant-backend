@@ -26,25 +26,25 @@ data class Foods (
   var quantity: Int,
   @Enumerated(EnumType.STRING)
   var category: Category,
-  var deprecated: Boolean
+  var valid: Boolean = true
 )
 
 @Entity
 data class MasterOrders (
-  @Id @GeneratedValue var id: Long,
+  @Id @GeneratedValue var id: Long? = null,
   var checkinDt: LocalDateTime = LocalDateTime.now(),
   var checkoutDt: LocalDateTime? = null,
   var moneyReturn: Float? = null,
   var payment: Float? = null,
   var price: Float? = null,
-  @ManyToOne var staff: Staffs,
+  @ManyToOne var staff: Staffs? = null,
   @Enumerated(EnumType.STRING)
   var status: Status = Status.Serving
 )
 
 @Entity
 data class Orders (
-  @Id @GeneratedValue var id: Long,
+  @Id @GeneratedValue var id: Long? = null,
   var orderedQty: Int,
   var arrivedQty: Int,
   @ManyToOne var masterOrder: MasterOrders,
@@ -53,7 +53,7 @@ data class Orders (
 
 @Entity
 data class Staffs (
-  @Id @GeneratedValue var id: Long,
+  @Id @GeneratedValue var id: Long? = null,
   var age: Int,
   var contactNum: String,
   var firstName: String,

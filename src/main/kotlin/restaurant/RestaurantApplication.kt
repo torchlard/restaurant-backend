@@ -12,11 +12,8 @@ import restaurant.service.DataInit
 class RestaurantApplication(val foodRepo: FoodRepository, val masterOrderRepo: MasterOrderRepository,
 						val orderRepo: OrderRepository, val staffRepo: StaffRepository, val tableRepo: TableRepository): CommandLineRunner {
 	override fun run(vararg args: String?) {
-
 		DataInit.initTable(foodRepo, masterOrderRepo, orderRepo, staffRepo, tableRepo)
-
 	}
-
 }
 
 fun main(args: Array<String>) {

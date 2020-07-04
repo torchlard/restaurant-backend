@@ -20,17 +20,16 @@ interface MasterOrderRepository: JpaRepository<MasterOrders, Long>, JpaSpecifica
   override fun findAll(pageable: Pageable): Page<MasterOrders>
 
   @Transactional @Modifying
-  @Query("insert into master_order('checkinDt','table_id') values(?2,?1)", nativeQuery = true)
-  fun createRecord(tableId: Long, checkinDt: String): MasterOrders?
+  @Query("insert into master_orders(checkin_dt) values(?1)", nativeQuery = true)
+  fun createRecord(checkinDt: String): Int
 
   @Transactional @Modifying
-  @Query("update master_order set checkout_dt=?1, status='Completed' where id = (" +
-      "select master_order_id from table where tableNo = ?2)) ", nativeQuery = true)
+  @Query("update master_orders set checkout_dt=?1, status='Completed' where id = (" +
+      "select master_order_id from table where table_no = ?2)) ", nativeQuery = true)
   fun checkout(checkoutDt: String = DateTimeHelper.getCurrentSQLDt(), tableId: Long)
 
-//  @Transactional @Modifying
-//  @Query("update MasterOrders m set m.checkinDt=?1, m.status='Serving' where m.id=?2")
-//  fun checkin(checkinDt: LocalDateTime, id: Long)
-
+  @Transactional @Modifying
+  @Query("alter table master_orders auto_increment=1", nativeQuery = true)
+  fun resetAutoIncrement()
 
 }

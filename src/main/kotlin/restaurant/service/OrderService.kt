@@ -3,12 +3,10 @@ package restaurant.service
 import org.springframework.stereotype.Service
 import restaurant.domain.ArriveOrderDTO
 import restaurant.domain.OrderDTO
-import restaurant.domain.QtyDTO
 import restaurant.domain.ResponseDto
 import restaurant.repository.FoodRepository
 import restaurant.repository.OrderRepository
 import restaurant.repository.TableRepository
-import restaurant.utils.SqlHelper
 import java.lang.RuntimeException
 import java.sql.SQLException
 
@@ -22,21 +20,24 @@ class OrderService(val foodRepo: FoodRepository, val orderRepo: OrderRepository,
           ?: throw RuntimeException("no master order found")
 //      verify food enough
       val qtyIds = foodRepo.selectQtyInBatch(orderList.map { it.foodId }.joinToString(","))
-      val foodList: List<Long> = orderList.map { orderObj ->
+
+      val failedfoodList = mutableListOf<Long>()
+      orderList.forEach { orderObj ->
         val ll = qtyIds.filter { it.foodId == orderObj.foodId }
 //        food not exist OR not enough food to order
-        if(ll.isEmpty() || ll[0].qty < orderObj.orderQty) -1L
-        else {
+        if(!ll.isEmpty() && ll[0].qty > orderObj.orderQty){
           try {
-            orderRepo.createOrder(orderObj.orderQty, masterOrderId, orderObj.foodId); -1
+            orderRepo.createOrder(orderObj.orderQty, masterOrderId, orderObj.foodId)
           } catch(e: Exception){
-            println("error: "+e.message); orderObj.foodId
+            println("error: "+e.message)
+            failedfoodList.add(orderObj.foodId)
           }
         }
-      }.filter { it != -1L }
+      }
 
-      ResponseDto(foodList.isEmpty(), foodList)
+      ResponseDto(failedfoodList.isEmpty(), failedfoodList)
     } catch(e: Exception){
+      e.printStackTrace()
       ResponseDto(false, listOf())
     }
   }
@@ -53,6 +54,7 @@ class OrderService(val foodRepo: FoodRepository, val orderRepo: OrderRepository,
       }
       ResponseDto(true, "")
     } catch (e: Exception){
+      e.printStackTrace()
       ResponseDto(false, "")
     }
   }
@@ -77,6 +79,7 @@ class OrderService(val foodRepo: FoodRepository, val orderRepo: OrderRepository,
       }
       ResponseDto(true, failedId)
     } catch(e: Exception) {
+      e.printStackTrace()
       ResponseDto(false, listOf())
     }
   }
@@ -96,6 +99,7 @@ class OrderService(val foodRepo: FoodRepository, val orderRepo: OrderRepository,
       }
       ResponseDto(true, failedId)
     } catch(e: Exception) {
+      e.printStackTrace()
       ResponseDto(false, listOf())
     }
   }

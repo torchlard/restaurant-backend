@@ -1,10 +1,13 @@
 package restaurant.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import restaurant.domain.MasterOrders
 import restaurant.domain.ResponseDto
+import restaurant.domain.Status
 import restaurant.repository.MasterOrderRepository
+import restaurant.repository.StaffRepository
 import restaurant.repository.TableRepository
 import restaurant.utils.DateTimeHelper
 import java.lang.Exception
@@ -12,30 +15,35 @@ import java.lang.RuntimeException
 import java.time.LocalDateTime
 
 @Service
-class MasterOrderService(val masterOrderRepo: MasterOrderRepository, val tableRepo: TableRepository) {
+class MasterOrderService(val staffRepo: StaffRepository,
+    val masterOrderRepo: MasterOrderRepository, val tableRepo: TableRepository) {
 
-  @Transactional
+  @Transactional(propagation = Propagation.SUPPORTS)
   fun checkin(tableId: Long): ResponseDto<String>{
     return try{
-      val masterOrder = masterOrderRepo.createRecord(tableId, DateTimeHelper.getCurrentSQLDt())
-          ?: throw RuntimeException("cannot create master order")
-      tableRepo.assignMasterId(tableId, masterOrder.id)
+//      val id = masterOrderRepo.createRecord(DateTimeHelper.getCurrentSQLDt())
+//      println(id)
+      val mo = MasterOrders(checkinDt = LocalDateTime.now(), status = Status.Serving)
+      val inserted = masterOrderRepo.save(mo)
+      tableRepo.assignMasterId(tableId, inserted.id)
       ResponseDto(true, "")
-    } catch (e: Exception){ ResponseDto(false,"", e.message) }
+    } catch (e: Exception){
+      e.printStackTrace()
+      ResponseDto(false,"", e.message)
+    }
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.SUPPORTS)
   fun checkout(tableId: Long): ResponseDto<String>{
     return try {
       masterOrderRepo.checkout(tableId = tableId)
       tableRepo.assignMasterId(tableId, null)
       ResponseDto(true, "")
     } catch(e: Exception){
+      e.printStackTrace()
       ResponseDto(false, "")
     }
   }
-
-
 
 }
 

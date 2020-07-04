@@ -15,10 +15,14 @@ class MasterOrderController (private val masterOrderService: MasterOrderService,
   @PostMapping("/checkin")
   fun checkin(@RequestBody dto: CheckinDTO): HttpStatus {
     return try {
-      if(masterOrderService.checkin(dto.tableId).success) HttpStatus.OK else HttpStatus.BAD_REQUEST
+      if(masterOrderService.checkin(dto.tableId).success) HttpStatus.OK
+      else HttpStatus.BAD_REQUEST
     }
     catch(e: IllegalArgumentException){ HttpStatus.BAD_REQUEST }
-    catch(e: Exception){ HttpStatus.INTERNAL_SERVER_ERROR }
+    catch(e: Exception){
+      e.printStackTrace()
+      HttpStatus.INTERNAL_SERVER_ERROR
+    }
   }
 
   @PostMapping("/checkout")

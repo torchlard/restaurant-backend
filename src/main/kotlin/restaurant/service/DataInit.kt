@@ -36,22 +36,23 @@ class DataInit {
       Staffs(3,29,"47567830","May","Chan",Gender.F,Position.Worker,"may","5678")
     )
 
-    val tables = listOf(
-      Tables(1,"T1",10,false),
-      Tables(2,"T2",8,false),
-      Tables(3,"T3",7,false),
-      Tables(4,"T4",4,true),
-      Tables(5,"T5",4,true),
-      Tables(6,"T6",4,true),
-      Tables(7,"T7",4,true),
-      Tables(8,"T8",6,true),
-      Tables(9,"T9",5,true)
-    )
 
     val masterOrders = listOf(
-      MasterOrders(id=1,checkinDt = LocalDateTime.of(2020,1,1,10,0,0), checkoutDt=LocalDateTime.of(2020,1,1,12,0,0),moneyReturn = 15f,payment =  30f,price =  15f,staff = staffs[0], table = tables[0], status = Status.Completed),
-      MasterOrders(id=2,staff=staffs[1],table=tables[1]),
-      MasterOrders(id=3,staff=staffs[2],table=tables[2])
+        MasterOrders(1,LocalDateTime.of(2020,1,1,10,0,0), LocalDateTime.of(2020,1,1,12,0,0), 15f, 30f, 15f, staffs[0], Status.Completed),
+        MasterOrders(id=2,staff=staffs[1]),
+        MasterOrders(id=3,staff=staffs[2])
+    )
+
+    val tables = listOf(
+      Tables(1,"T1",10),
+      Tables(2,"T2",8, masterOrders[1]),
+      Tables(3,"T3",7, masterOrders[2]),
+      Tables(4,"T4",4),
+      Tables(5,"T5",4),
+      Tables(6,"T6",4),
+      Tables(7,"T7",4),
+      Tables(8,"T8",6),
+      Tables(9,"T9",5)
     )
 
     val orders = listOf(
@@ -65,35 +66,22 @@ class DataInit {
     fun initTable(foodRepo: FoodRepository, masterOrderRepo: MasterOrderRepository, 
                   orderRepo: OrderRepository,staffRepo: StaffRepository, tableRepo: TableRepository){
       orderRepo.deleteAllInBatch()
-      masterOrderRepo.deleteAllInBatch()
-      staffRepo.deleteAllInBatch()
-      foodRepo.deleteAllInBatch()
       tableRepo.deleteAllInBatch()
+      masterOrderRepo.deleteAllInBatch()
+      foodRepo.deleteAllInBatch()
+      staffRepo.deleteAllInBatch()
 
-      tableRepo.saveAll(tables)
-      tableRepo.flush()
-      foodRepo.saveAll(foods)
-      foodRepo.flush()
+      orderRepo.resetAutoIncrement()
+      masterOrderRepo.resetAutoIncrement()
+      staffRepo.resetAutoIncrement()
+      foodRepo.resetAutoIncrement()
+      tableRepo.resetAutoIncrement()
+
       staffRepo.saveAll(staffs)
-      staffRepo.flush()
-      val staffAll = staffRepo.findAll()
-      val tableAll = tableRepo.findAll()
-      val foodAll = foodRepo.findAll()
-      val masterOrders = listOf(
-        MasterOrders(id=1, checkinDt = LocalDateTime.of(2020,1,1,10,0,0), checkoutDt=LocalDateTime.of(2020,1,1,12,0,0),
-          moneyReturn = 15f,payment =  30f,price =  15f,staff = staffAll.random(), table = tableAll.random(), status = Status.Completed)) +
-          (1..2).map{ MasterOrders(id=1, staff=staffAll.random(),table=tableAll.random()) }
+      foodRepo.saveAll(foods)
       masterOrderRepo.saveAll(masterOrders)
-      masterOrderRepo.flush()
-      val masterOrdersAll = masterOrderRepo.findAll()
-      val orders = listOf(
-        Orders(1,1,1, masterOrdersAll.random(), foodAll.random()),
-        Orders(2,3,2, masterOrdersAll.random(), foodAll.random()),
-        Orders(3,2,1, masterOrdersAll.random(), foodAll.random()),
-        Orders(4,3,3, masterOrdersAll.random(), foodAll.random())
-      )
+      tableRepo.saveAll(tables)
       orderRepo.saveAll(orders)
-
     }
 
   }

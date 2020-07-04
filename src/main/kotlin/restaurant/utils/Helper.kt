@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 
 class DateTimeHelper {
   companion object {
-    fun getCurrentSQLDt(): String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss"))
+    fun getCurrentSQLDt(): String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
   }
 }
 

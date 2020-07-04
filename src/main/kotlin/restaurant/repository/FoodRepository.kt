@@ -22,13 +22,18 @@ interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<F
   fun findDistinctCategory(): List<Category>
 
   @Transactional @Modifying
-  @Query("update Foods f set f.deprecated = true where f.id = ?1")
+  @Query("update Foods f set f.valid = false where f.id = ?1")
   fun deleteFood(foodId: Long)
 
-  @Query("select id,quantity from food f where id in (?1)", nativeQuery = true)
+  @Query("select id, quantity from food f where id in (?1)", nativeQuery = true)
   fun selectQtyInBatch(ids: String): List<QtyDTO>
 
+  @Transactional @Modifying
+  @Query("alter table foods auto_increment=1", nativeQuery = true)
+  fun resetAutoIncrement()
+
 }
+
 
 
 
