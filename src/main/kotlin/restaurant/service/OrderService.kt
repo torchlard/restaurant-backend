@@ -3,7 +3,9 @@ package restaurant.service
 import org.springframework.stereotype.Service
 import restaurant.domain.ArriveOrderDTO
 import restaurant.domain.OrderDTO
+import restaurant.domain.QtyDTO
 import restaurant.domain.ResponseDto
+import restaurant.repository.FoodRepository
 import restaurant.repository.OrderRepository
 import restaurant.repository.TableRepository
 import restaurant.utils.SqlHelper
@@ -11,15 +13,26 @@ import java.lang.RuntimeException
 import java.sql.SQLException
 
 @Service
-class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepository) {
+class OrderService(val foodRepo: FoodRepository, val orderRepo: OrderRepository, val tableRepo: TableRepository) {
 
+//  client create order
   fun createOrderInBatch(tableId: Long, orderList: List<OrderDTO>): ResponseDto<List<Long>> {
     return try {
       val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
           ?: throw RuntimeException("no master order found")
-      val foodList: List<Long> = orderList.map {
-        try { orderRepo.createOrder(it.orderQty, masterOrderId, it.foodId); -1
-        } catch(e: Exception){ println("error: "+e.message); it.foodId }
+//      verify food enough
+      val qtyIds = foodRepo.selectQtyInBatch(orderList.map { it.foodId }.joinToString(","))
+      val foodList: List<Long> = orderList.map { orderObj ->
+        val ll = qtyIds.filter { it.foodId == orderObj.foodId }
+//        food not exist OR not enough food to order
+        if(ll.isEmpty() || ll[0].qty < orderObj.orderQty) -1L
+        else {
+          try {
+            orderRepo.createOrder(orderObj.orderQty, masterOrderId, orderObj.foodId); -1
+          } catch(e: Exception){
+            println("error: "+e.message); orderObj.foodId
+          }
+        }
       }.filter { it != -1L }
 
       ResponseDto(foodList.isEmpty(), foodList)
@@ -30,15 +43,21 @@ class OrderService(val orderRepo: OrderRepository, val tableRepo: TableRepositor
 
   fun deleteOrderInBatch(tableId: Long, foodIds: List<Long>): ResponseDto<String> {
     return try {
-      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)
-          ?: throw RuntimeException("no master order found")
-      orderRepo.deleteOrdersInBatch(masterOrderId, foodIds.joinToString(","))
+      val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId) ?: throw RuntimeException("no master order found")
+      foodIds.forEach {
+        val order = orderRepo.selectOrder(masterOrderId, it)
+        if(order.arriveQty == 0){
+          orderRepo.deleteOrder(masterOrderId, it)
+          if(order.orderQty > 0) foodRepo.changeQty(order.orderQty, it)
+        }
+      }
       ResponseDto(true, "")
     } catch (e: Exception){
       ResponseDto(false, "")
     }
   }
 
+//  client update order
   fun updateOrderInBatch(tableId: Long, ll: List<OrderDTO>): ResponseDto<List<Long>> {
     return try {
       val masterOrderId = tableRepo.findMasterOrderByTableNo(tableId)

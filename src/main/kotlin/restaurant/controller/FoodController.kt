@@ -15,7 +15,7 @@ class FoodController(val foodRepo: FoodRepository, val foodService: FoodService)
 
   @GetMapping("/")
   fun findAll(): ResponseEntity<List<Foods>?>{
-    val foods = foodRepo.findAll() ?: return ResponseEntity(null, HttpStatus.BAD_REQUEST)
+    val foods = foodRepo.findAll()
     return ResponseEntity.ok(foods)
   }
 

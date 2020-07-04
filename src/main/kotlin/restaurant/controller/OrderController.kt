@@ -38,7 +38,7 @@ class OrderController(private val orderRepo: OrderRepository, private val orderS
 
   //  food arrived to client
   @PutMapping("/arriveqty")
-  fun updateArriveQty(@RequestBody dto: OrderListDTO<ArriveOrderDTO>): ResponseEntity<List<Long>> {
+  fun updateArriveQty(@RequestBody dto: OrderListDTO<ArriveOrderDTO>): ResponseEntity<List<Long>>{
     val res = orderService.updateArriveQtyInBatch(dto.tableId, dto.ll)
     if(res.success) return ResponseEntity.ok(res.data)
     return ResponseEntity(res.data, HttpStatus.BAD_REQUEST)

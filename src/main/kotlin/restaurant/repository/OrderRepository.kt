@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import restaurant.domain.Order2
 import restaurant.domain.Orders
 import javax.transaction.Transactional
 
@@ -26,6 +27,12 @@ interface OrderRepository: JpaRepository<Orders, Long>, JpaSpecificationExecutor
   @Query("update order set o.ordered_qty = ?1 where food_id=?2 and master_order_id=?3", nativeQuery=true)
   fun updateOrderQuantity(orderedQty: Int, foodId: Long, masterOrderId: Long)
 
+  @Query("select ordered_qty,arrived_qty from order where master_order_id=?1 and food_id = ?2", nativeQuery = true)
+  fun selectOrder(masterOrderId: Long, foodId: Long): Order2
+
+  @Transactional @Modifying
+  @Query("delete from order where master_order_id=?1 and food_id = ?2", nativeQuery = true)
+  fun deleteOrder(masterOrderId: Long, foodId: Long)
 
   @Transactional @Modifying
   @Query("delete from order where master_order_id=?1 and food_id in (?2)", nativeQuery = true)

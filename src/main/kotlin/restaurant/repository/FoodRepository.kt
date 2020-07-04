@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import restaurant.domain.Category
 import restaurant.domain.Foods
+import restaurant.domain.QtyDTO
 import javax.transaction.Transactional
 
 
@@ -14,8 +15,8 @@ import javax.transaction.Transactional
 interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<Foods> {
 
   @Transactional @Modifying
-  @Query("update foods set quantity = quantity- where id=?1", nativeQuery = true)
-  fun reduceQty(qty: Int, id: Long)
+  @Query("update foods set quantity = quantity+?1 where id=?2", nativeQuery = true)
+  fun changeQty(qty: Int, id: Long)
 
   @Query("select distinct f.category from Foods f")
   fun findDistinctCategory(): List<Category>
@@ -23,6 +24,9 @@ interface FoodRepository: JpaRepository<Foods, Long>, JpaSpecificationExecutor<F
   @Transactional @Modifying
   @Query("update Foods f set f.deprecated = true where f.id = ?1")
   fun deleteFood(foodId: Long)
+
+  @Query("select id,quantity from food f where id in (?1)", nativeQuery = true)
+  fun selectQtyInBatch(ids: String): List<QtyDTO>
 
 }
 
